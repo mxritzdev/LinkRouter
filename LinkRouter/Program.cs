@@ -15,7 +15,20 @@ public abstract class Program
         
         Directory.CreateDirectory(PathBuilder.Dir("data"));
         
+        builder.Services.AddRazorComponents()
+            .AddInteractiveServerComponents();
+
         builder.Services.AddControllers();
+        builder.Services.AddAntiforgery();
+
+        builder.Services.AddControllersWithViews()
+            .AddRazorOptions(options =>
+            {
+                options.ViewLocationFormats.Clear();
+                options.ViewLocationFormats.Add("~/App/Http/Views/{1}/{0}.cshtml");
+                options.ViewLocationFormats.Add("~/App/Http/Views/Shared/{0}.cshtml");
+            });
+        builder.Services.AddScoped<AdminService>();
         
         var loggerProviders = LoggerBuildHelper.BuildFromConfiguration(configuration =>
         {
@@ -50,7 +63,19 @@ public abstract class Program
         var app = builder.Build();
 
         app.UseMetricServer();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseAntiforgery();
+
         app.MapControllers();
+
+        app.MapRazorComponents<App.Http.Pages.App>()
+            .AddInteractiveServerRenderMode();
 
         app.Run();
     }
