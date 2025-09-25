@@ -1,11 +1,9 @@
 ﻿using LinkRouter.App.Models;
-using Newtonsoft.Json;
 
 namespace LinkRouter.App.Configuration;
 
 public class Config
 {
-    [JsonProperty("RouteOn/")]
     public string RootRoute { get; set; } = "https://example.com";
 
     public NotFoundBehaviorConfig NotFoundBehavior { get; set; } = new();
