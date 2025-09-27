@@ -37,38 +37,54 @@ public class RedirectController : Controller
     }
 
     [HttpGet("/{*path}")]
-    public IActionResult RedirectToExternalUrl(string path)
+    public async Task<ActionResult> RedirectToExternalUrl(string path)
     {
-        var redirectRoute = Config.Routes.FirstOrDefault(x => x.Route == path || x.Route == path + "/" || x.Route == "/" + path);
-
-        if (redirectRoute != null)
+        
+        if (!path.EndsWith("/"))
+            path += "/";
+        
+        path = "/" + path;
+        
+        Console.WriteLine(path);
+        
+        var redirectRoute = Config.CompiledRoutes?.FirstOrDefault(x => x.CompiledPattern.IsMatch(path));
+        
+        if (redirectRoute == null)
         {
-            RouteCounter
-                .WithLabels(redirectRoute.Route)
+            NotFoundCounter
+                .WithLabels(path)
                 .Inc();
             
-            return Redirect(redirectRoute.RedirectUrl);
-        }
+            if (Config.NotFoundBehavior.RedirectOn404)
+                return Redirect(Config.NotFoundBehavior.RedirectUrl);
             
-        NotFoundCounter
-            .WithLabels("/" + path)
-            .Inc();
+            return NotFound();
+        }
         
-        if (Config.NotFoundBehavior.RedirectOn404)
-            return Redirect(Config.NotFoundBehavior.RedirectUrl);
+        var match = redirectRoute.CompiledPattern.Match(path);
         
-        return NotFound();
+        Console.WriteLine(redirectRoute.CompiledPattern);
+        
+        string redirectUrl = redirectRoute.RedirectUrl;
+        
+        foreach (var placeholder in redirectRoute.Placeholders)
+        {
+            var value = match.Groups[placeholder.Value].Value;
+            redirectUrl = redirectUrl.Replace("{" + placeholder.Key + "}", value);
+        }
+        
+        return Redirect(redirectUrl);
     }
-    
+
     [HttpGet("/")]
     public IActionResult GetRootRoute()
     {
         RouteCounter
             .WithLabels("/")
             .Inc();
-        
+
         string url = Config.RootRoute;
-        
+
         return Redirect(url);
     }
 }
