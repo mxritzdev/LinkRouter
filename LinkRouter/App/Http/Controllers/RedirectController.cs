@@ -63,8 +63,6 @@ public class RedirectController : Controller
         
         var match = redirectRoute.CompiledPattern.Match(path);
         
-        Console.WriteLine(redirectRoute.CompiledPattern);
-        
         string redirectUrl = redirectRoute.RedirectUrl;
         
         foreach (var placeholder in redirectRoute.Placeholders)
