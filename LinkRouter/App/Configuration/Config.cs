@@ -104,4 +104,5 @@ public class Config
     }
     
     [JsonIgnore] public static Regex ErrorCodePattern = new(@"\s*\-\>\s*(\d+)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
 }
