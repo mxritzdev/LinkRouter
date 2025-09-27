@@ -10,7 +10,7 @@
 -   **Metrics Endpoint:** Exposes Prometheus-compatible metrics at `:5000/metrics` for easy observability and monitoring. [How to use](#metrics)
 -   **Docker-Deployable:** Comes with a minimal Dockerfile for easy containerized deployment.
 -   **Placeholders:** Supports placeholders in redirect URLs, allowing dynamic URL generation based on the requested path. For example, a route defined as `/user/{username}` can redirect to `https://example.com/profile/{username}`, where `{username}` is replaced with the actual value from the request.
--   **Status Code:** You are able to configure if the redirect should redirect to an url or just return a status code of your choice
+-   **Status Code:** You are able to configure if the redirect should redirect to an url or just return a custom status code of your choice. Example `"RedirectUrl": "-> 418"` will return the status code 418 (I'm a teapot :) )
 
 ## Configuration
 Routes are managed via a configuration file, `/data/config.json`. You can define paths and their corresponding URLs in this file. The application automatically normalizes routes to handle both trailing and non-trailing slashes.
