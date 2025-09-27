@@ -10,7 +10,6 @@ public class RedirectController : Controller
 {
 
     private readonly Config Config;
-    
       
     private readonly Counter RouteCounter = Metrics.CreateCounter(
         "linkrouter_requests",
@@ -39,7 +38,6 @@ public class RedirectController : Controller
     [HttpGet("/{*path}")]
     public async Task<ActionResult> RedirectToExternalUrl(string path)
     {
-        
         if (!path.EndsWith("/"))
             path += "/";
         
@@ -64,6 +62,13 @@ public class RedirectController : Controller
         var match = redirectRoute.CompiledPattern.Match(path);
         
         string redirectUrl = redirectRoute.RedirectUrl;
+        
+        if (Config.ErrorCodePattern.IsMatch(redirectUrl))
+        {
+            var errorCodeMatch = Config.ErrorCodePattern.Match(redirectUrl);
+            var errorCode = int.Parse(errorCodeMatch.Groups[1].Value);
+            return StatusCode(errorCode);
+        }
         
         foreach (var placeholder in redirectRoute.Placeholders)
         {
