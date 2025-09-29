@@ -4,11 +4,13 @@
 [⬇️How to install⬇️](#installation)
 
 ## Features
- -   **Path-based Redirection:** Reads a config file that maps paths to redirect URLs. When a request hits a registered path, the router issues an HTTP redirect to the corresponding target.
+-   **Path-based Redirection:** Reads a config file that maps paths to redirect URLs. When a request hits a registered path, the router issues an HTTP redirect to the corresponding target.
 -   **Hot Reloading:** The config is cached at startup and automatically reloaded when the file changes — no restart required. [Example config](#example-config)
 -   **Low Resource Usage:** Uses less than 50MB of RAM, making it ideal for constrained environments. 
 -   **Metrics Endpoint:** Exposes Prometheus-compatible metrics at `:5000/metrics` for easy observability and monitoring. [How to use](#metrics)
- -   **Docker-Deployable:** Comes with a minimal Dockerfile for easy containerized deployment.
+-   **Docker-Deployable:** Comes with a minimal Dockerfile for easy containerized deployment.
+-   **Placeholders:** Supports placeholders in redirect URLs, allowing dynamic URL generation based on the requested path. For example, a route defined as `/user/{username}` can redirect to `https://example.com/profile/{username}`, where `{username}` is replaced with the actual value from the request.
+-   **Status Code:** You are able to configure if the redirect should redirect to an url or just return a custom status code of your choice. Example `"RedirectUrl": "-> 418"` will return the status code 418 (I'm a teapot :) )
 
 ## Configuration
 Routes are managed via a configuration file, `/data/config.json`. You can define paths and their corresponding URLs in this file. The application automatically normalizes routes to handle both trailing and non-trailing slashes.
@@ -24,11 +26,15 @@ Routes are managed via a configuration file, `/data/config.json`. You can define
   "Routes": [
     {
       "Route": "/instagram", // has to start with a slash
-      "RedirectUrl": "https://instagram.com/{yourname}"
+      "RedirectUrl": "https://instagram.com/maxmustermann"
     },
     {
-      "Route": "/example", // has to start with a slash
-      "RedirectUrl": "https://example.com"
+      "Route": "/article/{id}", // {id} is a placeholder
+      "RedirectUrl": "https://example.com/article/{id}", // {id} will be replaced with the actual value from the request
+    },
+    {
+      "Route": "/teapot",
+      "RedirectUrl": "-> 418" // will return a 418 status code (I'm a teapot :) )
     }
   ]
 }
