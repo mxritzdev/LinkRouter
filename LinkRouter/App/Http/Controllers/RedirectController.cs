@@ -45,7 +45,7 @@ public class RedirectController : Controller
         
         Console.WriteLine(path);
         
-        var redirectRoute = Config.CompiledRoutes?.FirstOrDefault(x => x.CompiledPattern.IsMatch(path));
+        var redirectRoute = Config.CompiledRoutes!.FirstOrDefault(x => x.CompiledPattern.IsMatch(path));
         
         if (redirectRoute == null)
         {
