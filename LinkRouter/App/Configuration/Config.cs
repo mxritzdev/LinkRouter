@@ -82,6 +82,8 @@ public class Config
             compiled.CompiledPattern = new Regex(compiledRouteBuilder.ToString(),
                 RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+            Console.WriteLine(compiled.CompiledPattern.ToString());
+            
             var duplicate = matches
                 .Select((m, i) => m.Groups[1].Value)
                 .GroupBy(x => x)
