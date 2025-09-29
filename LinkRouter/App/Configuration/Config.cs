@@ -55,10 +55,14 @@ public class Config
 
             var escaped = Regex.Escape(route.Route);
 
-            var pattern = new Regex(@"\\{(\d|\w+)\}");
+            Console.WriteLine(escaped);
+            
+            var pattern = new Regex(@"\\\{(\d|\w+)\}");
 
             var matches = pattern.Matches(escaped);
 
+            Console.WriteLine(matches.Count + " matches found.");
+            
             foreach (var match in matches.Select(x => x))
             {
                 // Check if the placeholder is immediately followed by another placeholder
