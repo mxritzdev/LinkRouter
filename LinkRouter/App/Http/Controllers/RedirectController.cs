@@ -54,7 +54,13 @@ public class RedirectController : Controller
                 .Inc();
             
             if (Config.NotFoundBehavior.RedirectOn404)
-                return Redirect(Config.NotFoundBehavior.RedirectUrl);
+                if (Config.ErrorCodePattern.IsMatch(Config.NotFoundBehavior.RedirectUrl))
+                {
+                    var errorCodeMatch = Config.ErrorCodePattern.Match(Config.NotFoundBehavior.RedirectUrl);
+                    var errorCode = int.Parse(errorCodeMatch.Groups[1].Value);
+                    return StatusCode(errorCode);
+                } else
+                    return Redirect(Config.NotFoundBehavior.RedirectUrl);
             
             return NotFound();
         }
@@ -87,6 +93,13 @@ public class RedirectController : Controller
             .Inc();
 
         string url = Config.RootRoute;
+        
+        if (Config.ErrorCodePattern.IsMatch(url))
+        {
+            var errorCodeMatch = Config.ErrorCodePattern.Match(url);
+            var errorCode = int.Parse(errorCodeMatch.Groups[1].Value);
+            return StatusCode(errorCode);
+        }
 
         return Redirect(url);
     }

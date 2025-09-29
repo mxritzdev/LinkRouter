@@ -54,14 +54,10 @@ public class Config
             var replacements = new List<(int Index, int Length, string NewText)>();
 
             var escaped = Regex.Escape(route.Route);
-
-            Console.WriteLine(escaped);
             
-            var pattern = new Regex(@"\\\{(\d|\w+)\}");
+            var pattern = new Regex(@"\\\{(\d|\w+)\}", RegexOptions.CultureInvariant);
 
             var matches = pattern.Matches(escaped);
-
-            Console.WriteLine(matches.Count + " matches found.");
             
             foreach (var match in matches.Select(x => x))
             {
@@ -86,8 +82,6 @@ public class Config
             compiled.CompiledPattern = new Regex(compiledRouteBuilder.ToString(),
                 RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-            Console.WriteLine(compiled.CompiledPattern.ToString());
-            
             var duplicate = matches
                 .Select((m, i) => m.Groups[1].Value)
                 .GroupBy(x => x)
