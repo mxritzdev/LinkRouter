@@ -42,6 +42,8 @@ public abstract class Program
             JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true }));
 
         builder.Services.AddSingleton(config);
+        
+        builder.Services.AutoAddServices<Program>();
 
         builder.Services.AddMetricServer(options => { options.Port = 5000; });
 
