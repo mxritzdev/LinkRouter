@@ -22,12 +22,8 @@ public class RedirectionService
         {
             var url = Config.RootRoute;
 
-            if (Config.ErrorCodePattern.IsMatch(url))
-            {
-                var errorCodeMatch = Config.ErrorCodePattern.Match(url);
-                var errorCode = int.Parse(errorCodeMatch.Groups[1].Value);
-                return new StatusCodeResult(errorCode);
-            }
+            if (TryGetErrorCode(url, out var notFoundStatusCode))
+                return new StatusCodeResult(notFoundStatusCode);
 
             await MetricsService.IncrementFound("/");
 
