@@ -3,6 +3,7 @@ using LinkRouter.App.Configuration;
 using LinkRouter.App.Services;
 using MoonCore.Extensions;
 using MoonCore.Helpers;
+using MoonCore.Logging;
 using Prometheus;
 
 namespace LinkRouter;
@@ -13,18 +14,13 @@ public abstract class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        Directory.CreateDirectory(PathBuilder.Dir("data"));
+        Directory.CreateDirectory(Path.Combine("data"));
 
         builder.Services.AddControllers();
 
-        var loggerProviders = LoggerBuildHelper.BuildFromConfiguration(configuration =>
-        {
-            configuration.Console.Enable = true;
-            configuration.Console.EnableAnsiMode = true;
-        });
-
         builder.Logging.ClearProviders();
-        builder.Logging.AddProviders(loggerProviders);
+        
+        builder.Logging.AddAnsiConsole();
 
         builder.Services.AddHostedService<ConfigWatcher>();
 
