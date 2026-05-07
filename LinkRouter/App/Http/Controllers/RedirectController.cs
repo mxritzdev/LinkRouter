@@ -16,15 +16,39 @@ public class RedirectController : Controller
         RedirectionService = redirectionService;
     }
 
-    [HttpGet("/{*path}")]
-    public async Task<ActionResult> RedirectToExternalUrl(string path)
+    [HttpGet("{*path}")]
+    public async Task<ActionResult> RedirectToExternalUrl(string? path)
     {
-        return await RedirectionService.GetRedirect(path);
-    }
 
-    [HttpGet("/")]
-    public async Task<ActionResult> GetRootRoute()
-    {
-        return await RedirectionService.GetRedirect(string.Empty);
+        path = string.IsNullOrWhiteSpace(path)
+            ? "/"
+            : $"/{path.Trim('/')}/";
+
+
+        if (!RedirectionService.TryGetRedirect(path, out var rawRedirect) || rawRedirect == null)
+        {
+            // metrics for 404
+
+            if (string.IsNullOrEmpty(rawRedirect))
+                return NotFound();
+
+            if (RedirectionService.TryGetErrorCode(rawRedirect, out var notFoundStatusCode))
+                return StatusCode(notFoundStatusCode);
+
+
+            return RedirectPermanent(rawRedirect);
+        }
+
+        // metrics for everything else
+
+
+        if (RedirectionService.TryGetErrorCode(path, out var code))
+            return StatusCode(code);
+
+
+        // metrics for path
+
+
+        return RedirectPermanent(rawRedirect);
     }
 }

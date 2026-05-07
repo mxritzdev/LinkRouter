@@ -1,9 +1,8 @@
-using MoonCore.Attributes;
 using Prometheus;
 
 namespace LinkRouter.App.Services;
 
-[Singleton]
+
 public class MetricsService
 {
     private readonly Counter RouteCounter = Metrics.CreateCounter(

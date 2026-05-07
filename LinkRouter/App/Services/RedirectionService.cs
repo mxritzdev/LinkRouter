@@ -1,63 +1,45 @@
 using LinkRouter.App.Configuration;
 using Microsoft.AspNetCore.Mvc;
-using MoonCore.Attributes;
 
 namespace LinkRouter.App.Services;
 
-[Singleton]
 public class RedirectionService
 {
     private readonly Config Config;
-    private readonly MetricsService MetricsService;
 
-    public RedirectionService(Config config, MetricsService metricsService)
+    public RedirectionService(Config config)
     {
         Config = config;
-        MetricsService = metricsService;
     }
 
-    public async Task<ActionResult> GetRedirect(string path)
+    public bool TryGetRedirect(string path, out string? redirectPath)
     {
-        if (path == "")
+        redirectPath = null;
+
+        if (path == "/")
         {
             var url = Config.RootRoute;
 
-            if (TryGetErrorCode(url, out var notFoundStatusCode))
-                return new StatusCodeResult(notFoundStatusCode);
+            redirectPath = url;
 
-            await MetricsService.IncrementFound("/");
-
-            return new RedirectResult(url);
+            return true;
         }
-
-        if (!path.EndsWith("/"))
-            path += "/";
-
-        path = "/" + path;
-
 
         var redirectRoute = Config.CompiledRoutes?.FirstOrDefault(x => x.CompiledPattern.IsMatch(path));
 
-
         if (redirectRoute == null)
         {
-            await MetricsService.IncrementNotFound(path);
-
             if (!Config.NotFoundBehavior.RedirectOn404)
-                return new NotFoundResult();
+            {
+                return false;
+            }
 
+            redirectPath = Config.NotFoundBehavior.RedirectUrl;
 
-            if (TryGetErrorCode(Config.NotFoundBehavior.RedirectUrl, out var notFoundStatusCode))
-                return new StatusCodeResult(notFoundStatusCode);
-
-            return new RedirectResult(Config.NotFoundBehavior.RedirectUrl);
+            return true;
         }
 
         var match = redirectRoute.CompiledPattern.Match(path);
-
-        if (TryGetErrorCode(redirectRoute.RedirectUrl, out var statusCode))
-            return new StatusCodeResult(statusCode);
-
 
         foreach (var placeholder in redirectRoute.Placeholders)
         {
@@ -65,16 +47,16 @@ public class RedirectionService
             redirectRoute.RedirectUrl = redirectRoute.RedirectUrl.Replace("{" + placeholder.Key + "}", value);
         }
 
-        await MetricsService.IncrementFound(path);
+        redirectPath = redirectRoute.RedirectUrl;
 
-        return new RedirectResult(redirectRoute.RedirectUrl);
+        return true;
     }
 
-    private bool TryGetErrorCode(string url, out int code)
+    public bool TryGetErrorCode(string path, out int code)
     {
-        if (Config.ErrorCodePattern.IsMatch(url))
+        if (Config.ErrorCodePattern.IsMatch(path))
         {
-            var errorCodeMatch = Config.ErrorCodePattern.Match(url);
+            var errorCodeMatch = Config.ErrorCodePattern.Match(path);
             code = int.Parse(errorCodeMatch.Groups[1].Value);
             return true;
         }

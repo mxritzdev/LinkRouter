@@ -1,9 +1,8 @@
 using System.Text.Json;
 using LinkRouter.App.Configuration;
+using LinkRouter.App.Implemlementations;
 using LinkRouter.App.Services;
-using MoonCore.Extensions;
-using MoonCore.Helpers;
-using MoonCore.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Prometheus;
 
 namespace LinkRouter;
@@ -19,8 +18,8 @@ public abstract class Program
         builder.Services.AddControllers();
 
         builder.Logging.ClearProviders();
-        
-        builder.Logging.AddAnsiConsole();
+        builder.Logging.AddConsole(options => { options.FormatterName = nameof(LoggingConsoleFormatter); });
+        builder.Logging.AddConsoleFormatter<LoggingConsoleFormatter, ConsoleFormatterOptions>();
 
         builder.Services.AddHostedService<ConfigWatcher>();
 
@@ -39,7 +38,9 @@ public abstract class Program
 
         builder.Services.AddSingleton(config);
         
-        builder.Services.AutoAddServices<Program>();
+        builder.Services.AddSingleton<MetricsService>();
+
+        builder.Services.AddSingleton<RedirectionService>();
 
         builder.Services.AddMetricServer(options => { options.Port = 5000; });
 
