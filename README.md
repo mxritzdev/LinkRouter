@@ -18,7 +18,7 @@ Routes are managed via a configuration file, `/data/config.json`. You can define
 ### Example Config
 ```json
 {
-  "RootRoute": "https://example.com", // route on the root on the app (eg: yourdomain.com)
+  "RootRedirect": "https://example.com", // route on the root on the app (eg: yourdomain.com), leave empty for 404
   "NotFoundBehavior": { // the behavior when the requested path was not found in the routes below
     "RedirectOn404": false, // if it should redirect on 404
     "RedirectUrl": "https://example.com/404" // where it should redirect to
