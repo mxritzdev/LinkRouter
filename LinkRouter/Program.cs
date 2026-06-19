@@ -1,6 +1,6 @@
 using System.Text.Json;
-using LinkRouter.App.Configuration;
 using LinkRouter.App.Implemlementations;
+using LinkRouter.App.Models;
 using LinkRouter.App.Services;
 using Microsoft.Extensions.Logging.Console;
 using Prometheus;

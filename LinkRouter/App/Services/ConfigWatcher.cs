@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using LinkRouter.App.Configuration;
+using LinkRouter.App.Models;
 
 namespace LinkRouter.App.Services;
 
@@ -47,7 +47,7 @@ public class ConfigWatcher : BackgroundService
             var config = JsonSerializer.Deserialize<Config>(content);
 
             Config.Routes = config?.Routes ?? [];
-            Config.RootRoute = config?.RootRoute ?? "https://example.com";
+            Config.RootRedirect = config?.RootRedirect ?? "https://example.com";
 
             Logger.LogInformation("Config file changed.");
 

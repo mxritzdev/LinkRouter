@@ -1,13 +1,28 @@
 ﻿using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using LinkRouter.App.Models;
 
-namespace LinkRouter.App.Configuration;
+namespace LinkRouter.App.Models;
 
 public class Config
 {
-    public string RootRoute { get; set; } = "https://example.com";
+    [JsonPropertyName("RootRedirect")] public string? RootRedirect { get; set; } = "https://example.com";
+
+    // Legacy property, only used during deserialization
+    [Obsolete]
+    [JsonPropertyName("RootRoute")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? LegacyRootRoute
+    {
+        get => null; // never serialize
+        set
+        {
+            if (!string.IsNullOrEmpty(value) && string.IsNullOrEmpty(RootRedirect))
+            {
+                RootRedirect = value;
+            }
+        }
+    }
 
     public NotFoundBehaviorConfig NotFoundBehavior { get; set; } = new();
 
@@ -39,11 +54,7 @@ public class Config
 
         foreach (var route in Routes)
         {
-            if (!route.Route.StartsWith("/"))
-                route.Route = "/" + route.Route;
-
-            if (!route.Route.EndsWith("/"))
-                route.Route += "/";
+            route.Route = "/" + route.Route.Trim('/') + "/";
 
             var compiled = new CompiledRoute
             {
@@ -55,9 +66,9 @@ public class Config
 
             var escaped = Regex.Escape(route.Route);
             
-            var pattern = new Regex(@"\\\{(\d|\w+)\}", RegexOptions.CultureInvariant);
 
-            var matches = pattern.Matches(escaped);
+
+            var matches = Patterns.PlaceholderPattern.Matches(escaped);
             
             foreach (var match in matches.Select(x => x))
             {
@@ -102,7 +113,5 @@ public class Config
         CompiledRoutes = compiledRoutes
             .ToArray();
     }
-    
-    [JsonIgnore] public static Regex ErrorCodePattern = new(@"\s*\-\>\s*(\d+)\s*$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
 }

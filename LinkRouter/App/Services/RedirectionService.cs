@@ -1,5 +1,4 @@
-using LinkRouter.App.Configuration;
-using Microsoft.AspNetCore.Mvc;
+using LinkRouter.App.Models;
 
 namespace LinkRouter.App.Services;
 
@@ -18,7 +17,10 @@ public class RedirectionService
 
         if (path == "/")
         {
-            var url = Config.RootRoute;
+            var url = Config.RootRedirect;
+
+            if (string.IsNullOrEmpty(url))
+                return false;
 
             redirectPath = url;
 
@@ -52,12 +54,13 @@ public class RedirectionService
         return true;
     }
 
-    public bool TryGetErrorCode(string path, out int code)
+    public bool TryGetStatusCode(string path, out int code)
     {
-        if (Config.ErrorCodePattern.IsMatch(path))
+        var match = Patterns.ErrorCodePattern.Match(path);
+
+        if (match.Success)
         {
-            var errorCodeMatch = Config.ErrorCodePattern.Match(path);
-            code = int.Parse(errorCodeMatch.Groups[1].Value);
+            code = int.Parse(match.Groups[1].Value);
             return true;
         }
 

@@ -1,4 +1,4 @@
-using LinkRouter.App.Configuration;
+using LinkRouter.App.Models;
 using LinkRouter.App.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,46 +9,42 @@ public class RedirectController : Controller
 {
     private readonly Config Config;
     private readonly RedirectionService RedirectionService;
+    private readonly MetricsService MetricsService;
 
-    public RedirectController(Config config, RedirectionService redirectionService)
+    public RedirectController(Config config, RedirectionService redirectionService, MetricsService metricsService)
     {
         Config = config;
         RedirectionService = redirectionService;
+        MetricsService = metricsService;
     }
 
     [HttpGet("{*path}")]
-    public async Task<ActionResult> RedirectToExternalUrl(string? path)
+    public async Task<ActionResult> RedirectTo(string? path)
     {
+        Console.WriteLine(path);
 
         path = string.IsNullOrWhiteSpace(path)
             ? "/"
             : $"/{path.Trim('/')}/";
 
-
         if (!RedirectionService.TryGetRedirect(path, out var rawRedirect) || rawRedirect == null)
         {
-            // metrics for 404
-
             if (string.IsNullOrEmpty(rawRedirect))
                 return NotFound();
 
-            if (RedirectionService.TryGetErrorCode(rawRedirect, out var notFoundStatusCode))
+            if (RedirectionService.TryGetStatusCode(rawRedirect, out var notFoundStatusCode))
                 return StatusCode(notFoundStatusCode);
 
+            await MetricsService.IncrementNotFound(path);
 
-            return RedirectPermanent(rawRedirect);
+            return Redirect(rawRedirect);
         }
 
-        // metrics for everything else
-
-
-        if (RedirectionService.TryGetErrorCode(path, out var code))
+        if (RedirectionService.TryGetStatusCode(path.Trim('/'), out var code))
             return StatusCode(code);
 
+        await MetricsService.IncrementFound(path);
 
-        // metrics for path
-
-
-        return RedirectPermanent(rawRedirect);
+        return Redirect(rawRedirect);
     }
 }
