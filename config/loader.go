@@ -7,6 +7,13 @@ import (
 
 func Load(path string) (*Config, error) {
 
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
 	data, err := os.ReadFile(path)
 
 	if err != nil {
