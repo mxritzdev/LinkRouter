@@ -8,11 +8,11 @@ RUN go mod download
 
 COPY . .
 
-ARG TARGETOS
-ARG TARGETARCH
+ENV CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
 
-RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} \
-    go build -o app .
+RUN go build -o app ./cmd/linkrouter
 
 FROM alpine:3.20
 
@@ -21,5 +21,7 @@ WORKDIR /bin
 COPY --from=builder /build/app .
 
 WORKDIR /
+
+EXPOSE 8080
 
 ENTRYPOINT ["./bin/app"]
