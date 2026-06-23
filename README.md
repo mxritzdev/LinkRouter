@@ -6,7 +6,6 @@
 ## Features
 -   **Path-based Redirection:** Reads a config file that maps paths to redirect URLs. When a request hits a registered path, the router issues an HTTP redirect to the corresponding target.
 -   **Low Resource Usage:** Uses less than 50MB of RAM, making it ideal for constrained environments. 
--   **Metrics Endpoint:** Exposes Prometheus-compatible metrics at `:5000/metrics` for easy observability and monitoring. [How to use](#metrics)
 -   **Docker-Deployable:** Comes with a minimal Dockerfile for easy containerized deployment.
 -   **Placeholders:** Supports placeholders in redirect URLs, allowing dynamic URL generation based on the requested path. For example, a route defined as `/user/{username}` can redirect to `https://example.com/profile/{username}`, where `{username}` is replaced with the actual value from the request.
 -   **Status Code:** You are able to configure if the redirect should redirect to an url or just return a custom status code of your choice. Example `"RedirectUrl": "-> 418"` will return the status code 418 (I'm a teapot :) )
@@ -59,31 +58,6 @@ services:
 1. Run this command: `docker run -p 80:8080 -v ./data:/app/data ghcr.io/mxritzdev/linkrouter:latest`
 2. Configure your routes in `./data/config.json`
 
-## Metrics - **NOT YET IMPLEMENTED**
-Prometheus-compatible metrics are exposed on `:5000/metrics`
-
-> ‼️**Do not expose port `5000` to the public internet, instead use internal [docker networking](https://docs.docker.com/engine/network/)**
-
-### Available Metrics
-
-The following metrics are currently exported:
-
--   `linkrouter_requests{route="..."}` — Counter of total redirects served, labeled by route.
-    
--   `linkrouter_404_requests{route="..."}` — Counter of requests that resulted in a 404 Not Found, labeled by the originally requested route.
-
-    
-Metrics follow the Prometheus exposition format, and can be scraped directly by Prometheus or queried via tools like Grafana. [Example Grafana Dashboard](.ressources/example-grafana-dashboard.json)
-
-![image](.resources/img/grafana-dashboard.png)
-
-### Example Prometheus Scrape Config
-```yaml
-scrape_configs:
-  -  job_name:  'linkrouter'
-    static_configs:
-    -  targets: ['{linkrouter host}:5000']
-```
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue to discuss improvements or new features.
