@@ -1,7 +1,7 @@
 package routing
 
 import (
-	"linkrouter/config"
+	"linkrouter/src/config"
 	"log"
 	"regexp"
 	"strings"

@@ -2,11 +2,11 @@ FROM golang:1.26.4-alpine AS builder
 
 WORKDIR /build
 
-COPY go.mod go.sum ./
+COPY ../go.mod go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY .. .
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \

@@ -1,8 +1,8 @@
 ﻿package main
 
 import (
-	"linkrouter/config"
-	"linkrouter/internal/routing"
+	"linkrouter/src/config"
+	"linkrouter/src/internal/routing"
 	"log"
 
 	"github.com/gin-gonic/gin"
