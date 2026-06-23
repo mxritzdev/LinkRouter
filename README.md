@@ -5,7 +5,6 @@
 
 ## Features
 -   **Path-based Redirection:** Reads a config file that maps paths to redirect URLs. When a request hits a registered path, the router issues an HTTP redirect to the corresponding target.
--   **Hot Reloading:** The config is cached at startup and automatically reloaded when the file changes — no restart required. [Example config](#example-config)
 -   **Low Resource Usage:** Uses less than 50MB of RAM, making it ideal for constrained environments. 
 -   **Metrics Endpoint:** Exposes Prometheus-compatible metrics at `:5000/metrics` for easy observability and monitoring. [How to use](#metrics)
 -   **Docker-Deployable:** Comes with a minimal Dockerfile for easy containerized deployment.
@@ -18,31 +17,31 @@ Routes are managed via a configuration file, `/data/config.json`. You can define
 ### Example Config
 ```json
 {
-  "RootRedirect": "https://example.com", // route on the root on the app (eg: yourdomain.com), leave empty for 404
-  "NotFoundBehavior": { // the behavior when the requested path was not found in the routes below
-    "RedirectOn404": false, // if it should redirect on 404
-    "RedirectUrl": "https://example.com/404" // where it should redirect to
+  "RootRedirect": "https://example.com", // leave empty for 404
+  "NotFoundBehaviour": {
+    "RedirectOn404": false,
+    "RedirectUrl": ""
   },
   "Routes": [
     {
-      "Route": "/instagram", // has to start with a slash
-      "RedirectUrl": "https://instagram.com/maxmustermann"
+      "Route": "/github", // has to start with a /
+      "RedirectUrl": "https://github.com/yourgithub"
     },
     {
       "Route": "/article/{id}", // {id} is a placeholder
-      "RedirectUrl": "https://example.com/article/{id}", // {id} will be replaced with the actual value from the request
+      "RedirectUrl": "https://example.com/article/{id}" // {id} will be replaced in with the actual value from the request
     },
     {
       "Route": "/teapot",
-      "RedirectUrl": "-> 418" // will return a 418 status code (I'm a teapot :) )
-    }
+      "RedirectUrl": "-> 418" // returns status code 418 (I'm a teapot :) )
+    },
   ]
 }
 ```
 ## Installation
 > **Docker** is required to deploy this project. [Install docker](https://docs.docker.com/get-started/)
 
-### Using Docker Compose
+### Using Docker Compose - **NOT YET CONFIGURED**
 1. Create a `docker-compose.yml` file with the following content:
 
 ```yaml
@@ -60,7 +59,7 @@ services:
 1. Run this command: `docker run -p 80:8080 -v ./data:/app/data ghcr.io/mxritzdev/linkrouter:latest`
 2. Configure your routes in `./data/config.json`
 
-## Metrics
+## Metrics - **NOT YET IMPLEMENTED**
 Prometheus-compatible metrics are exposed on `:5000/metrics`
 
 > ‼️**Do not expose port `5000` to the public internet, instead use internal [docker networking](https://docs.docker.com/engine/network/)**
