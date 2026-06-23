@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	configuration, err := config.Load("data/config.json")
+	configuration, err := config.Load("./data/config.json")
 
 	if err != nil {
 		log.Fatal(err)
