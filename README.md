@@ -1,3 +1,5 @@
+# This version is still in early development, use the old version instead [Install old version](https://github.com/mxritzdev/LinkRouter/tree/master#installation)
+
 # Linkrouter
 **LinkRouter** is a lightweight, configurable routing application that directs incoming requests to designated target URLs based on a user-defined configuration file.
 
