@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	log.Println("LinkRouter - mxritz.dev")
+	log.Println("LinkRouter - mxritz.dev ")
 
 	router := gin.Default()
 
