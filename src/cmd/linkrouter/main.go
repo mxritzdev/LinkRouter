@@ -22,5 +22,6 @@ func main() {
 
 	routing.Routes(router, configuration)
 
+	log.Println("Running on 0.0.0.0:8080")
 	router.Run(":8080")
 }
